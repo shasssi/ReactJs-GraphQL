@@ -1,33 +1,51 @@
 import React, { useState } from "react";
+import { useMutation } from "@apollo/client";
+import { SIGNIN_MUTATION } from "../graphql/queries/user";
+import { useNavigate } from "react-router-dom";
 
 const LoginComponent = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+  const [signIn, { error }] = useMutation(SIGNIN_MUTATION);
+  const navigate = useNavigate();
 
   const handleInputChange = (e: any) => {
     setEmail(e?.target?.value);
-    setError("");
+    setErrorMsg("");
   };
 
   const handlePasswordChange = (e: any) => {
     setPassword(e?.target?.value);
-    setError("");
+    setErrorMsg("");
   };
 
-  const handleSignIn = () => {
+  const handleSignIn = async () => {
     if (!email || !password) {
-      setError("Please enter email and password");
+      setErrorMsg("Please enter email and password");
       return;
     }
+    signIn({
+      variables: {
+        email,
+        password,
+      },
+    })
+      .then((res) => {
+        setEmail("");
+        setPassword("");
+        window.localStorage.setItem("token", res?.data?.signIn?.token);
+        navigate("/users");
+      })
+      .catch((err) => {});
   };
 
   return (
     <div>
       <div className="m-auto shadow-md flex w-2/6 justify-center flex-col gap-4 p-10 mt-24">
-        {error && (
+        {(errorMsg || error?.message) && (
           <p className="p-2 text-white text-1xl bg-red-500 text-center rounded-md">
-            {error}
+            {errorMsg || error?.message}
           </p>
         )}
         <p className="font-bold text-center text-slate-500 text-4xl">Login</p>

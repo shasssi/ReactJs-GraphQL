@@ -1,12 +1,19 @@
 import React from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import LoginComponent from "./components/Login";
+import UserComponent from "./components/User";
+import RouteMiddleware from "./components/RouteMiddleware";
 
 const App = () => {
   return (
-    // <div className="text-3xl font-bold p-4 shadow-md">Hello from Graphql</div>
-    <div>
-      <LoginComponent />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route element={<RouteMiddleware />}>
+          <Route path="/users" element={<UserComponent />} />
+        </Route>
+        <Route path="/" element={<LoginComponent />} />
+      </Routes>
+    </BrowserRouter>
   );
 };
 
